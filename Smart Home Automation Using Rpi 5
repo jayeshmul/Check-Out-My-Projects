@@ -1,0 +1,76 @@
+#include <ESP8266WiFi.h>
+#include <ThingSpeak.h>
+
+// WiFi credentials
+const char* ssid = "Robotronix_2.4"; // set available wifi name
+const char* password = "Robo_IMPS@789"; // set password
+
+// ThingSpeak details
+unsigned long channelNumber =  2707771;
+const char* writeAPIKey = "M3P7TM4LFDL3QXLQ";
+
+WiFiClient client;
+
+// Pin definitions
+const int relay1 = D1;
+const int relay2 = D3;
+const int relay3 = D4;
+const int relay4 = D5;
+
+void setup() {
+  // Initialize serial monitor
+  Serial.begin(115200);
+  delay(10);
+
+  // Initialize pins
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+  pinMode(relay4, OUTPUT);
+  digitalWrite(relay1, LOW);  // Initially turn off relays
+  digitalWrite(relay2, LOW);
+  digitalWrite(relay3, LOW); 
+  digitalWrite(relay4, LOW);
+
+  // Connect to WiFi
+  Serial.println("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting...");
+  }
+  Serial.println("Connected!");
+
+  // Initialize ThingSpeak
+  ThingSpeak.begin(client);
+}
+
+void loop() {
+  // Read data from ThingSpeak
+  long field1Data = ThingSpeak.readLongField(2707771, 1);  // Read Light status
+  long field2Data = ThingSpeak.readLongField(2707771, 2);  // Read Fan status
+
+  // Control relays based on ThingSpeak data
+  if (field1Data == 1) {
+    digitalWrite(relay1, HIGH);  // Turn on Light
+  } else {
+    digitalWrite(relay1, LOW);  // Turn off Light
+  }
+
+  if (field2Data == 1) {
+    digitalWrite(relay2, HIGH);  // Turn on Fan
+  } else {
+    digitalWrite(relay2, LOW);  // Turn off Fan
+  }
+if (field2Data == 1) {
+    digitalWrite(relay3, HIGH);  // Turn on Fan
+  } else {
+    digitalWrite(relay3, LOW);  // Turn off Fan
+  }
+  if (field2Data == 1) {
+    digitalWrite(relay4, HIGH);  // Turn on Fan
+  } else {
+    digitalWrite(relay4, LOW);  // Turn off Fan
+  }
+  delay(100);  // Wait before the next update
+}
